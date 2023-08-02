@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <head>
+        <title>Todo Home</title>
+        <style>
+            *{
+                padding: 0;
+                margin: 0;
+            }
+            ul{
+                list-style-type: none; 
+                width: 80%; 
+                margin-left: 10%; 
+                border: 1px solid rgba(0,0,0,0.1);
+                border-radius: 10px;
+                overflow: hidden;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="todo-container" style="display: flex; margin-top: 10%;">
+            <section style="width: 50%;">
+                <h1 style="text-align: center;">Todo List</h1>
+                <ul id="todo-list">
+                </ul>
+            </section>
+            <section style="width: 50%;">
+                <h1>TODO FROM</h1>
+                <input type="text" placeholder="Title" name="todo_title" id="todo-title"><br><br>
+                <input type="text" placeholder="TODO" name="todo_text" id="todo-text"><br><br>
+                <input type="file" name="todo_icon" id="todo-icon"><br><br>
+                <button type="button" name="todo_add_btn" id="todo-add-btn" onclick="addTask()">Add Item</button><br/><br/>
+            </section>
+        </div>
+        <script>
+            const task_title = document.getElementById("todo-title")
+            const task_text = document.getElementById("todo-text");
+            const task_icon = document.getElementById("todo-icon");
+            const add_task_btn = document.getElementById("todo-add-btn");
+            const ul = document.getElementById("todo-list");
+            fetch('/todos').then(function(res){
+                if(res.status === 200){
+                    return res.json();
+                }
+                else if(res.status === 401){
+                    window.location.href = '/login';
+                }
+                else{
+                    alert("Something went wrong");
+                }
+            })
+            .then(function(todos){
+                for(let todo in todos){
+                    putItemInList(todo,todos[todo]);
+                }
+            }).catch((err)=>{
+                console.log(err.message);
+            });
+
+            function putItemInList(id,todo) {
+                let li = document.createElement('li');
+                li.id = id;
+
+                let task_title = document.createElement("h1");
+                task_title.textContent = todo['title'];
+                //Title Style...
+                task_title.style.color = "#ffffff";
+                task_title.style.backgroundColor = "#010101";
+                task_title.style.paddingLeft = "2%";
+
+                let task_description = document.createElement("p");
+                task_description.textContent = todo["description"];
+                //paragraph style...
+                task_description.style.backgroundColor = "rgba(0,255,0,.5)";
+                // task_text.style.color = "#ffffff";
+                task_description.style.paddingLeft = "5%";
+
+
+                let task_status = document.createElement("input");
+                task_status.type = "checkbox";
+                task_status.checked = todo['status'];
+                //checkbox style...
+                task_status.style.backgroundColor = "#000000";
+                task_status.style.color = "#ffffff";
+
+                let delete_btn = document.createElement("input");
+                delete_btn.type = "button";
+                delete_btn.value = "X" ;
+                delete_btn.width = "32px";
+                //button style...
+                delete_btn.style.color = "#ffffff";
+                delete_btn.style.backgroundColor = "#ff0000";
+                li.appendChild(task_title);
+                li.appendChild(task_description);
+                li.appendChild(task_status);
+                li.appendChild(delete_btn);
+                ul.appendChild(li);
+
+                delete_btn.addEventListener("click", function(ev){
+                    const remove_task =ev.target.parentElement;
+                });
+            }
+
+            function addTask(){
+                let task = {
+                    id:null,
+                    title:task_title.value,
+                    description:task_text.value,
+                    status:false,
+                };
+
+                fetch('/add-task', {
+                    method:'POST',
+                    headers:{'Content-Type':'application/json'},
+                    body: JSON.stringify(task),
+                })
+                .then((res)=>{
+                        if(res.status === 200){
+                            // try{
+                            //     return res.json();
+                            // }
+                            // catch(err){
+                            //     console.log(err.message);
+                            // }
+                            return res.json();
+                        }
+                        else{
+                            alert("Server Error");
+                        }
+                    })
+                    .then((todo)=>{
+                        putItemInList(Object.keys(todo),todo);
+                    })
+                    .catch((err)=>{
+                        console.log(err.message);
+                });
+            }
+        </script>
+    </body>
+</html>

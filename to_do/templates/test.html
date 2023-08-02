@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test</title>
+    <style>
+        *{
+            padding: 0;
+            margin: 0;
+        }
+
+        #task_title{
+            height: 40px;
+            max-width: 400px;
+            font-size: 32px;
+            border: 0px none transparent;
+            outline: none;
+            color: "#00ff00";
+            overflow: hidden;
+        }
+        #task_title:hover{
+            cursor: pointer;
+            outline: none;
+        }
+
+        #todo_container{
+            width:60%;
+            margin-left: 20%; 
+            margin-right: 20%;
+            border: 1px solid rgba(0 ,0, 0, .3); 
+            border-radius: 10px; 
+            overflow: hidden;
+        }
+
+        #todo_header{
+            background-color: rgba(0,0,255,.55);
+            display: flex; 
+            gap: 20px; 
+            margin-left: auto;
+        }
+        textarea{
+            border: none;
+            cursor: pointer;
+            outline: none;
+            overflow: hidden;
+        }
+        #todo_card{
+            border:1px dashed rgba(0,0,0,0.7);
+        }
+
+    </style>
+</head>
+<body>
+    <div id="todo_container">
+        <div id="todo_header">
+            <img src="./static/icons/list-check.svg" alt="Todo List" width="40">
+            <label for="todo" style="width: 200px; font-size: 40px;">TODO</label>
+        </div>
+        <ul style="list-style-type: none;width: 100%;">
+            <li>
+                <div id="todo_card">
+                    <div id="task_input_container" style="display: flex; gap: 16px; flex-wrap: wrap;">
+                        <input type="text" name="task_title" id="task_title" placeholder="Task Title">
+                        <img src="./static/icons/edit.svg" alt="Edit" width="32">
+                        <img src="./static/icons/trash.svg" alt="Trash" width="32">
+                    </div><hr>
+                    <textarea name="description" id="" cols="100%" rows="4" placeholder="Describe Here..."></textarea>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <script>
+        const task_title = document.getElementById("task_title");
+
+    </script>
+</body>
+</html>
