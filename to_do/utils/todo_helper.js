@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-module.exports.todoReader = function(user_id = "Ram",callback) {
+module.exports.todoReader = function(user_id,callback) {
     fs.readFile(path.dirname(__dirname) + '/models/todos_db.json','utf-8', function(err,data){
         let todos = {}
         if (err){
@@ -33,7 +33,7 @@ module.exports.todoWriter = function(user_id = "Ram",todo,callback){
             data=JSON.parse(content);
         }
         catch(e){
-            console.log("Json Parse EError")
+            console.log("Json Parse Error")
         }
         data = data === undefined ? {} : data;
         if(!data[user_id]){
