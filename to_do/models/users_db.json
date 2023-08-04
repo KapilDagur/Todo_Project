@@ -1,14 +1,16 @@
 {
-  "15408b00-31e4-11ee-92af-3b3f24584b3e": {
+  "0a21a420-32cf-11ee-bf5a-fd50ad776ee2": {
     "admin@users.in": {
       "username": "Admin",
-      "password": "12345678"
+      "password": "123456",
+      "picture": "0a20b9c0-32cf-11ee-bf5a-fd50ad776ee2"
     }
   },
-  "7e293b80-31e4-11ee-9f76-57241c1437cc": {
-    "ram@yahoo.com": {
-      "username": "Ram",
-      "password": "987654321"
+  "238362e0-32d5-11ee-95a8-0d0ce912f490": {
+    "google@company.co": {
+      "username": "Google",
+      "password": "654321",
+      "picture": "23829f90-32d5-11ee-95a8-0d0ce912f490"
     }
   }
 }

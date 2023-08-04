@@ -2,6 +2,7 @@ const bodyParser = require('body-parser');
 const express = require('express');
 const session = require('express-session');
 const {v1:uuid1} = require('uuid');
+const multer = require('multer');
 
 //Custom Modules require
 const todo_helper = require('./utils/todo_helper');
@@ -25,6 +26,25 @@ app.use(session({
 app.set('views','templates');
 // set view engine to ejs (templating language)
 app.set('view engine','ejs');
+//static file serve
+app.use(express.static('templates'));
+//media static file serve
+app.use(express.static('media'));
+
+const multerStorage = multer.diskStorage({
+    destination:function(req,file,callback){
+        callback(null,"media");
+    },
+    filename:function(req,file,callback){
+        callback(null,uuid1());
+    }
+});
+
+const upload = multer({
+    storage:multerStorage,
+})
+
+app.use(upload.single("picture"));
 
 //Auth Routes...
 app.get('/auth',function(req,res){
@@ -59,8 +79,9 @@ app.post('/login', function(req,res){
                 || users[userid][uname]["username"] === username)
                 && users[userid][uname]["password"] === password){
                 req.session.is_logged_in = true;
-                req.session.username = req.body['username'];
+                req.session.username = uname === username ? users[userid][uname]["username"] : username;
                 req.session.userid = userid;
+                req.session.picture = users[userid][uname]["picture"];
                 res.redirect('/');
                 return;
             }
@@ -83,11 +104,13 @@ app.post('/register', function(req,res){
     let user_username = req.body['username'];
     let user_email = req.body['email'];
     let user_password = req.body['password'];
+    let user_picture = req.file;
 
     let user = {};
     user[user_email] = {
         username:user_username,
-        password:user_password
+        password:user_password,
+        picture:user_picture.filename
     };
     user_helper.userWriter(user_id,user,function(err){
         if(err){
@@ -96,6 +119,7 @@ app.post('/register', function(req,res){
         }
         req.session.userid = user_id;
         req.session.username = user_username;
+        req.session.picture = user_picture.filename;
         req.session.is_logged_in = true;
         res.redirect('/');
     });
@@ -108,7 +132,7 @@ app.get('/', function(req,res){
     }
     else{
         console.log(`User ${req.session.username} Connected`);
-        res.render('index',{username:req.session.username});
+        res.render('index',{username:req.session.username,picture:req.session.picture});
     }
 });
 
@@ -125,10 +149,39 @@ app.post('/add-task', function(req,res){
         description:req.body['description'],
         status:req.body['status'],
     };
-    todo_helper.todoWriter(req.session.userid,task);
-    res.status(200).json(task);
+    todo_helper.todoWriter(req.session.userid,task,function(err){
+        if(err){
+            res.sendstatus(501);
+            return;
+        }
+        res.status(200).json(task);
+    });
 });
 
+app.delete('/remove-task', function(req,res){
+    const user_id = req.session.userid;
+    const task_id = req.body['task_id'];
+    todo_helper.todoRemoval(user_id,task_id,function(err){
+        if(!err){
+            res.sendStatus(200);
+            return;
+        }
+        res.sendStatus(501);
+    });
+});
+
+app.put('/status-task', function(req,res){
+    const user_id = req.session.userid;
+    const task_id = req.body['task_id'];
+    const task_status = req.body['task_status'];
+    todo_helper.todoModifier(user_id,task_id,"status",task_status,function(err){
+        if(!err){
+            res.sendStatus(200);
+            return;
+        }
+        res.sendStatus(501);
+    });
+});
 
 app.listen(3000, ()=>{
     console.log("Server is running on port : http://localhost:3000");
