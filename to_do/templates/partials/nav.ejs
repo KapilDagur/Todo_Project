@@ -1,6 +1,11 @@
 <nav>
     <label for="greeting" style="display:flex; justify-content: end; gap: 40px;">
-        <img src="<%= picture %>" alt="Picture" width="100" style="border-radius: 50%;">
+        <img src="<% if (picture) {
+             %><%=picture %><% 
+            }
+            else {
+                %> ./static/icons/default_user.png 
+            <%} %>" alt="Picture" width="100" style="border-radius: 50%;">
         <span style="margin-right: 20px;">
             <p style="text-align: right;">Welcome : Mr. <%=username%></p>
             <a href="/logout">Logout</a>

@@ -58,7 +58,7 @@ app.get('/auth',function(req,res){
 
 app.get('/login', function(req,res){
     if(!req.session.is_logged_in){
-        res.render('login');
+        res.render('login',{err:null});
     }
     else{
         res.redirect('/');
@@ -75,9 +75,7 @@ app.post('/login', function(req,res){
         }
         for (let userid in users) {
             let uname = Object.keys(users[userid]).toString();
-            if((uname === username
-                || users[userid][uname]["username"] === username)
-                && users[userid][uname]["password"] === password){
+            if((uname === username || users[userid][uname]["username"] === username) && users[userid][uname]["password"] === password){
                 req.session.is_logged_in = true;
                 req.session.username = uname === username ? users[userid][uname]["username"] : username;
                 req.session.userid = userid;
@@ -92,7 +90,7 @@ app.post('/login', function(req,res){
 
 app.get('/register',function(req,res){
     if(!req.session.is_logged_in){
-        res.render('register');
+        res.render('register',{err:null});
     }
     else{
         res.redirect('/');
@@ -104,26 +102,43 @@ app.post('/register', function(req,res){
     let user_username = req.body['username'];
     let user_email = req.body['email'];
     let user_password = req.body['password'];
-    let user_picture = req.file;
+    let user_picture = req.file === undefined ? null : req.file.filename;
 
     let user = {};
     user[user_email] = {
         username:user_username,
         password:user_password,
-        picture:user_picture.filename
+        picture:user_picture
     };
     user_helper.userWriter(user_id,user,function(err){
         if(err){
-            res.render('register',{error:err.message});
+            res.render('register',{err:err.message});
             return;
         }
         req.session.userid = user_id;
         req.session.username = user_username;
-        req.session.picture = user_picture.filename;
+        req.session.picture = user_picture;
         req.session.is_logged_in = true;
         res.redirect('/');
     });
 });
+
+app.get('/logout', function(req,res){
+    if(!req.session.is_logged_in){
+        res.redirect('/login');
+        return;
+    }
+    else{
+        console.log(`User Disconnected : ${req.session.username}`);
+        req.session.destroy(function(err){
+            if(err){
+                res.redirect('/login',{err:err.message});
+                return;
+            }
+            res.redirect('/login');
+        });
+    }
+})
 
 //Todo Routes...
 app.get('/', function(req,res){
@@ -131,7 +146,7 @@ app.get('/', function(req,res){
         res.redirect('/auth');
     }
     else{
-        console.log(`User ${req.session.username} Connected`);
+        console.log(`User Connected : ${req.session.username}`);
         res.render('index',{username:req.session.username,picture:req.session.picture});
     }
 });

@@ -43,7 +43,12 @@ module.exports.todoRemoval = function(user_id,task_id,callback){
             callback(err);
             return;
         }
-        delete data[user_id][task_id];
+        if(!task_id){
+            delete data[user_id];
+        }
+        else{
+            delete data[user_id][task_id];
+        }
         writer(data,function(err){
             if(err){
                 callback(err);
@@ -75,13 +80,13 @@ function reader(callback){
     fs.readFile('models/todos_db.json',"utf-8", function(err,data){
         let parsedData = {};
         if(err){
-            callback(new Error("Error : ServerErrorR "));
+            callback(new Error("Error : ServerErrorFRE "));
             return;
         }
         try {
             parsedData = JSON.parse(data);
         } catch (err) {
-            callback(new Error("Error : JSONParsingError "));
+            callback(new Error("Error : ServerErrorJPE "));
             return;
         }
         callback(null,parsedData);
@@ -91,7 +96,7 @@ function reader(callback){
 function writer(data,callback){
     fs.writeFile(path.dirname(__dirname)+'/models/todos_db.json',JSON.stringify(data,null,2),function(err){
         if(err){
-            callback(new Error("Error : ServerErrorW"));
+            callback(new Error("Error : ServerErrorFWE"));
             return;
         }
         callback(null);

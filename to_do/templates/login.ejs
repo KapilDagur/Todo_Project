@@ -4,9 +4,14 @@
     </head>
     <body>
         <form action="/login" method="post">
-            Username:<input type="text" name="username"><br><br>
-            Password:<input type="password" name="password"><br><br>
-            <button type="submit">Log In</button>
+            Username:<input type="text" name="username" placeholder="Email or Username" required><br><br>
+            Password:<input type="password" name="password" placeholder="Password" required><br><br>
+            <button type="submit">Log In</button><br><br>
+            <label for="error_message" style="color: red;">
+                <% if (err) { %>
+                    Error : <%= err %><br/>
+                <% } %>
+            </label>
         </form>
     </body>
 </html>
