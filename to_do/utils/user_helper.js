@@ -35,40 +35,57 @@ module.exports.userWriter = function(user_id,user,callback){
             }
             callback(null);
         });
-    })
+    });
+}
 
-    // fs.readFile(path.dirname(__dirname)+'/models/users_db.json','utf-8',function(err,users){
-    //     let users_data;
-    //     if(err){
-    //         callback(new Error("FileReadingError: Unable to Reading File"));
-    //         return;
-    //     }
-    //     else{
-    //         try{
-    //             users_data=JSON.parse(users);
-    //         }
-    //         catch(e){}
-    //     }
-    //     if(users_data === undefined){
-    //         users_data={};
-    //         users_data[user_id] = user;
-    //     }
-    //     else{
-    //         for(let uid in users_data){
-    //             if(Object.keys(users_data[uid]).toString()=== Object.keys(user).toString()){
-    //                 callback(new Error("Email Already exist, Try Another!!! "));
-    //                 return;
-    //             }
-    //         }
-    //         users_data[user_id] = user;
-    //     }
-    //     fs.writeFile(path.dirname(__dirname)+"/models/users_db.json",JSON.stringify(users_data,null,2),function(err){
-    //         if(err){
-    //             callback(new Error("Server Error"));
-    //         }
-    //     });
-    //     callback(null);
-    // });
+module.exports.userModifier = function(userid,password,update,callback){
+    reader(function(err,users){
+        let username;
+        if(err){
+            callback(err);
+            return;
+        }
+        username = Object.keys(users[userid]).toString();
+        if(users[userid][username]["password"] !== password){
+            return callback(new Error("Password doesn't Matched !!!"));
+        }
+        else if(update.password){
+            users[userid][username]["password"] = update.password;
+        }
+        if(update.username){
+            users[userid][username]["username"] = update.username;
+        }
+        if(update.picture){
+            users[userid][username]["picture"]  = update.picture;
+        }
+        writer(users,function(err){
+            if(err){
+                callback(err);
+                return;
+            }
+            callback(null);
+        });
+    });
+}
+
+module.exports.userRemoval = function(userid,password,callback){
+    reader(function(err,users){
+        let username;
+        if(err){
+            return callback(err);
+        }
+        username = Object.keys(users[userid]).toString();
+        if(users[userid][username]["password"] !== password){
+            return callback(new Error("Password Doesn't Match !!!"));
+        }
+        delete users[userid];
+        writer(users,function(err){
+            if(err){
+                return callback(err);
+            }
+            return callback(null);
+        });
+    });
 }
 
 function reader(callback){
@@ -79,7 +96,7 @@ function reader(callback){
             return;
         }
         try{
-            data = JSON.parse(content)
+            data = JSON.parse(content);
         }
         catch(err){
             callback(new Error("Error : ServerErrorJPE"));

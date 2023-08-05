@@ -1,3 +1,9 @@
 {
-  
+  "0cc0dad0-33a5-11ee-b90c-0904497b8d84": {
+    "admin@users.in": {
+      "username": "Admin",
+      "password": "123456",
+      "picture": null
+    }
+  }
 }

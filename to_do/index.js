@@ -138,7 +138,72 @@ app.get('/logout', function(req,res){
             res.redirect('/login');
         });
     }
-})
+});
+
+
+//User Routes...
+app.get('/edit-user',function(req,res){
+    if(!req.session.is_logged_in){
+        return res.redirect('/');
+    }
+    return res.render('edit',{username:req.session.username,error:null});
+});
+
+app.post('/edit-user',function(req,res){
+    if(!req.session.is_logged_in){
+        return res.redirect('/');
+    }
+    let userid = req.session.userid;
+    let new_username = req.body['new_username'];
+    let old_password = req.body['old_password'];
+    let new_password = req.body['new_password'];
+    let new_picture = req.file;
+
+    let update = {
+        username: new_username === undefined || new_username === "" ? null : new_username,
+        password:new_password,
+        picture:new_picture === undefined || new_picture === "" ? null:new_picture.filename,
+    }
+    user_helper.userModifier(userid,old_password,update,function(err){
+        if(err){
+            return res.render('edit',{username:req.session.username,error:err});
+        }
+        res.redirect('/');
+    });
+
+});
+
+app.get('/remove-user', function(req,res){
+    if(!req.session.is_logged_in){
+        return res.redirect('/login');
+    }
+    return res.render('remove',{err:null});
+});
+
+app.post('/remove-user', function(req,res){
+    if(!req.session.is_logged_in){
+        return res.redirect('/login');
+    }
+    let password = req.body['password'];
+
+    user_helper.userRemoval(req.session.userid,password,function(err){
+        if(err){
+            return res.render('remove',{err:err});
+        }
+        todo_helper.todoRemoval(req.session.userid,null,function(err){
+            if(err){
+                return res.render('remove',{err:err});
+            }
+        });
+        req.session.destroy(function(err){
+            if(err){
+                return res.render('remove',{err:err});
+            }
+        });
+        return res.redirect('/');
+    });
+});
+
 
 //Todo Routes...
 app.get('/', function(req,res){

@@ -34,6 +34,7 @@ function putItemInList(id,todo) {
     task_title.style.color = "#1F1F1F";
     task_title.style.backgroundColor = "#25D366";
     task_title.style.paddingLeft = "2%";
+    task_title.style.textDecoration = todo['status'] ? "line-through" : "none";
 
     let task_description = document.createElement("p");
     task_description.textContent = "Description : " + todo["description"];
@@ -41,6 +42,7 @@ function putItemInList(id,todo) {
     task_description.style.backgroundColor = "#212121";
     task_description.style.color = "#EDEDED";
     task_description.style.paddingLeft = "5%";
+    task_description.style.textDecoration = todo['status'] ? "line-through" : "none";
 
 
     let task_status = document.createElement("input");
@@ -80,15 +82,17 @@ function putItemInList(id,todo) {
         .then(function(res){
             if(res.status === 200){
                 if(!status){
-                    target_node.style.textDecoration = "none";
+                    target_node.children[0].style.textDecoration = "none";
+                    target_node.children[1].style.textDecoration = "none";
                 }
                 else{
-                    target_node.style.textDecoration = "line-through";
+                    target_node.children[0].style.textDecoration = "line-through";
+                    target_node.children[1].style.textDecoration = "line-through";
                 }
             }
             else{
-                    task_status.checked["value"] = !status;
-                    alert("Task Not Updated");
+                task_status.checked["value"] = !status;
+                alert("Task Not Updated");
             }
         })
         .catch(function(err){
